@@ -16,3 +16,11 @@ Package.onUse(function (api) {
 
   api.mainModule('server.js', 'server');
 });
+
+Package.onTest(function (api) {
+  api.use([
+    'tinytest',
+    'ecmascript'
+  ], 'server');
+  api.addFiles('lib/toBoolean_tests.js', 'server');
+});

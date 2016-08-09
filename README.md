@@ -32,6 +32,14 @@ The default Mocha reporter for server tests is the "spec" reporter. You can set 
 SERVER_TEST_REPORTER="dot" meteor test --once --driver-package dispatch:mocha
 ```
 
+### Colors
+
+You can set the `MOCHA_USE_COLORS` environment variable to enable colors.
+```bash
+MOCHA_USE_COLORS=1 meteor test --once --driver-package dispatch:mocha
+```
+
+
 ## NPM Scripts
 
 A good best practice is to define these commands as run scripts in your app's `package.json` file. For example:
