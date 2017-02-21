@@ -1,0 +1,24 @@
+{
+  "name": "experimental-meteor-mocha-electron",
+  "private": true,
+  "scripts": {
+    "test": "TEST_BROWSER_DRIVER=nightmare meteor test --once --full-app --driver-package dispatch:mocha",
+    "watch": "TEST_WATCH=1 TEST_BROWSER_DRIVER=nightmare meteor test --full-app --driver-package dispact:mocha",
+    "debug": "TEST_WATCH=1 DEBUG='meteor-mocha:*' DEBUG_FD=1 DEBUG_COLORS=1 meteor test --full-app --driver-package dispatch:mocha"
+  },
+  "dependencies": {
+    "babel-runtime": "^6.23.0",
+    "debug": "^2.6.1",
+    "meteor-node-stubs": "~0.2.0",
+    "nightmare": "^2.9.1"
+  },
+  "devDependencies": {},
+  "standard": {
+    "globals": [
+      "Meteor",
+      "describe",
+      "it",
+      "Package"
+    ]
+  }
+}
