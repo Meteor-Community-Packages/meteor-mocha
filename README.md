@@ -1,6 +1,6 @@
 # dispatch:mocha
 
-[![CircleCI](https://circleci.com/gh/keyscores/meteor-mocha.svg?style=svg)](https://circleci.com/gh/keyscores/meteor-mocha)
+[![CircleCI](https://circleci.com/gh/keyscores/meteor-mocha/tree/default.svg?style=svg)](https://circleci.com/gh/keyscores/meteor-mocha/tree/default)
 
 A Mocha test driver package for Meteor 1.3. This package reports server AND client test results in the server console and can be used for running tests on a CI server or locally. This achieves what `spacejam` does but without the need for a separate Node package.
 
