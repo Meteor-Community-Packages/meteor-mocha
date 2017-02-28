@@ -1,23 +1,16 @@
 import { mochaInstance } from 'meteor/practicalmeteor:mocha-core';
 import { startBrowser } from 'meteor/aldeed:browser-tests';
+import { setArgs } from './runtimeArgs'
 
-const reporter = process.env.SERVER_TEST_REPORTER || 'spec';
-
-// If TEST_BROWSER_DRIVER is not set, assume the app has only server tests
-const shouldRunClientTests = !!process.env.TEST_BROWSER_DRIVER;
-const shouldRunInParallel = !!process.env.TEST_PARALLEL;
-const shouldExitWhenDone = !process.env.TEST_WATCH;
-
-// pass the current env settings to the client.
-Meteor.startup(() => {
-  Meteor.settings.public = Meteor.settings.public || {};
-  Meteor.settings.public.CLIENT_TEST_REPORTER = process.env.CLIENT_TEST_REPORTER;
-});
+setArgs();
+const { mochaOptions, runnerOptions } = Meteor.settings.public.runtimeArgs || {};
+const { clientReporter, grep, invert, reporter } = mochaOptions || {};
 
 // Since intermingling client and server log lines would be confusing,
 // the idea here is to buffer all client logs until server tests have
 // finished running and then dump the buffer to the screen and continue
 // logging in real time after that if client tests are still running.
+
 let serverTestsDone = false;
 const clientLines = [];
 function clientLogBuffer(line) {
@@ -54,7 +47,7 @@ function exitIfDone(type, failures) {
   } else {
     serverFailures = failures;
     serverTestsDone = true;
-    if (shouldRunClientTests) {
+    if (runnerOptions.runClient) {
       clientLines.forEach((line) => {
         // printing and removing the extra new-line character. The first was added by the client log, the second here.
         console.log(line.replace(/\n$/, ''));
@@ -63,14 +56,16 @@ function exitIfDone(type, failures) {
   }
 
   if (callCount === 2) {
-    if (shouldRunClientTests) {
+    if (runnerOptions.runClient) {
       console.log('All client and server tests finished!\n');
       console.log('--------------------------------');
       console.log(`SERVER FAILURES: ${serverFailures}`);
       console.log(`CLIENT FAILURES: ${clientFailures}`);
       console.log('--------------------------------');
     }
-    if (shouldExitWhenDone) {
+
+    // if no env for TEST_WATCH, tests should exit when done
+    if (!runnerOptions.testWatch) {
       if (clientFailures + serverFailures > 0) {
         process.exit(1); // exit with non-zero status if there were failures
       } else {
@@ -81,39 +76,43 @@ function exitIfDone(type, failures) {
 }
 
 function serverTests(cb) {
-  printHeader('SERVER');
+  if (runnerOptions.runServer){
+    printHeader('SERVER');
 
-  // We need to set the reporter when the tests actually run to ensure no conflicts with
-  // other test driver packages that may be added to the app but are not actually being
-  // used on this run.
-  mochaInstance.reporter(reporter);
+    // We need to set the reporter when the tests actually run to ensure no conflicts with
+    // other test driver packages that may be added to the app but are not actually being
+    // used on this run.
+    mochaInstance.reporter(reporter);
 
-  mochaInstance.run((failureCount) => {
-    exitIfDone('server', failureCount);
-    if (cb) cb();
-  });
+    mochaInstance.run((failureCount) => {
+      exitIfDone('server', failureCount);
+      if (cb) cb();
+    });
+  }
 }
 
 function clientTests() {
-  if (!shouldRunClientTests) {
-    console.log('SKIPPING CLIENT TESTS BECAUSE TEST_BROWSER_DRIVER ENVIRONMENT VARIABLE IS NOT SET');
-    exitIfDone('client', 0);
-    return;
+  if (runnerOptions.runClient){
+    if(!runnerOptions.browserDriver) {
+      console.log('SKIPPING CLIENT TESTS BECAUSE TEST_BROWSER_DRIVER ENVIRONMENT VARIABLE IS NOT SET');
+      exitIfDone('client', 0);
+      return;
+    }
+
+    printHeader('CLIENT');
+
+    startBrowser({
+      stdout(data) {
+        clientLogBuffer(data.toString());
+      },
+      stderr(data) {
+        clientLogBuffer(data.toString());
+      },
+      done(failureCount) {
+        exitIfDone('client', failureCount);
+      },
+    });
   }
-
-  printHeader('CLIENT');
-
-  startBrowser({
-    stdout(data) {
-      clientLogBuffer(data.toString());
-    },
-    stderr(data) {
-      clientLogBuffer(data.toString());
-    },
-    done(failureCount) {
-      exitIfDone('client', failureCount);
-    },
-  });
 }
 
 // Before Meteor calls the `start` function, app tests will be parsed and loaded by Mocha
@@ -121,7 +120,7 @@ function start() {
   // Run in PARALLEL or SERIES
   // Running in series is a better default since it avoids db and state conflicts for newbs.
   // If you want parallel you will know these risks.
-  if (shouldRunInParallel) {
+  if (runnerOptions.runParallel) {
     console.log('Warning: Running in parallel can cause side-effects from state/db sharing');
 
     serverTests();
