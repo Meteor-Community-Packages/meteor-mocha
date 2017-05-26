@@ -4,7 +4,7 @@ import { startBrowser } from 'meteor/meteortesting:browser-tests';
 import setArgs from './runtimeArgs';
 
 const { mochaOptions, runnerOptions } = setArgs();
-const { grep, invert, reporter, serverReporter, xUnitOutput } = mochaOptions || {};
+const { grep, invert, timeout, reporter, serverReporter, xUnitOutput } = mochaOptions || {};
 
 // Since intermingling client and server log lines would be confusing,
 // the idea here is to buffer all client logs until server tests have
@@ -86,6 +86,7 @@ function serverTests(cb) {
 
   if (grep) mochaInstance.grep(grep);
   if (invert) mochaInstance.options.invert = invert;
+  if (timeout) mochaInstance.options.timeout = timeout;
 
   // We need to set the reporter when the tests actually run to ensure no conflicts with
   // other test driver packages that may be added to the app but are not actually being

@@ -13,9 +13,10 @@ function runTests() {
 
   if (!runnerOptions.runClient) return;
 
-  const { clientReporter, grep, invert, reporter } = mochaOptions || {};
+  const { clientReporter, grep, invert, timeout, reporter } = mochaOptions || {};
   if (grep) mocha.grep(grep);
   if (invert) mocha.options.invert = invert;
+  if (timeout) mocha.options.timeout = timeout;
 
   if (runnerOptions.browserDriver) {
     mocha.reporter(clientReporter || reporter);

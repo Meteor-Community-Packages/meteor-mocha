@@ -99,6 +99,10 @@ To run all tests with names that match a pattern, add the environment variable `
 
 To exclude any tests, you must use the grep option above plus `MOCHA_INVERT=1`. For example, to exclude tests named 'TODO:' (which you may want to exclude from your continuous integration workflow) you would pass at runtime `MOCHA_GREP=your_string MOCHA_INVERT=1`
 
+### Specify global timeout
+
+To override Mocha's default timeout for all tests, add the environment variable `MOCHA_GLOBAL_TIMEOUT=your_timeout_in_ms`
+
 ### Run in parallel
 
 By default meteortesting:mocha will run in series. This is a safety mechanism since running a client test and server test which depend on DB state may have side effects.

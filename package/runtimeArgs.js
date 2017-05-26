@@ -2,6 +2,7 @@ export default function setArgs() {
   const {
     CLIENT_TEST_REPORTER,
     MOCHA_GREP,
+    MOCHA_GLOBAL_TIMEOUT,
     MOCHA_INVERT,
     MOCHA_REPORTER,
     SERVER_TEST_REPORTER,
@@ -17,6 +18,7 @@ export default function setArgs() {
     mochaOptions: {
       grep: MOCHA_GREP || false,
       invert: !!MOCHA_INVERT,
+      timeout: MOCHA_GLOBAL_TIMEOUT || 2000,
       reporter: MOCHA_REPORTER || 'spec',
       serverReporter: SERVER_TEST_REPORTER,
       clientReporter: CLIENT_TEST_REPORTER,
