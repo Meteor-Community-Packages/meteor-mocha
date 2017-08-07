@@ -16,6 +16,7 @@ function runTests() {
   const { clientReporter, grep, invert, reporter } = mochaOptions || {};
   if (grep) mocha.grep(grep);
   if (invert) mocha.options.invert = invert;
+  mocha.options.useColors = true;
 
   if (runnerOptions.browserDriver) {
     mocha.reporter(clientReporter || reporter);
