@@ -84,6 +84,7 @@ function serverTests(cb) {
 
   printHeader('SERVER');
 
+  mochaInstance.options.useColors = true;
   if (grep) mochaInstance.grep(grep);
   if (invert) mochaInstance.options.invert = invert;
 
