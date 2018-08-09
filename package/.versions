@@ -9,7 +9,7 @@ ecmascript-runtime-client@0.6.0
 ecmascript-runtime-server@0.5.0
 ejson@1.1.0
 http@1.4.0
-lmieulet:meteor-coverage@1.1.4
+lmieulet:meteor-coverage@2.0.2
 logging@1.1.19
 meteor@1.8.2
 meteorhacks:picker@1.0.3
