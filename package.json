@@ -8,6 +8,7 @@
   },
   "scripts": {
     "lint": "eslint ./package",
+    "lint:fix": "eslint --fix ./package",
     "publish": "cd package && semantic-release"
   },
   "author": "Dispatch Technologies, Inc. (https://www.dispatch.me/)",

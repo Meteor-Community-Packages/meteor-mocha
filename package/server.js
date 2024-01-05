@@ -1,24 +1,30 @@
 /* global Package */
-import { mochaInstance } from "meteor/meteortesting:mocha-core";
-import { startBrowser } from "meteor/meteortesting:browser-tests";
-import { onMessage } from "meteor/inter-process-messaging";
+import { mochaInstance } from 'meteor/meteortesting:mocha-core';
+import { startBrowser } from 'meteor/meteortesting:browser-tests';
+import { onMessage } from 'meteor/inter-process-messaging';
 
-import fs from "fs";
+import fs from 'fs';
 
-import setArgs from "./runtimeArgs";
-import handleCoverage from "./server.handleCoverage";
+import setArgs from './runtimeArgs';
+import handleCoverage from './server.handleCoverage';
 
-var { mochaOptions, runnerOptions, coverageOptions } = setArgs();
-var { grep, invert, reporter, serverReporter, serverOutput, clientOutput } =
-  mochaOptions || {};
+let mochaOptions;
+let runnerOptions;
+let coverageOptions;
+let grep;
+let invert;
+let reporter;
+let serverReporter;
+let serverOutput;
+let clientOutput;
 
-if (Package["browser-policy-common"] && Package["browser-policy-content"]) {
-  const { BrowserPolicy } = Package["browser-policy-common"];
+if (Package['browser-policy-common'] && Package['browser-policy-content']) {
+  const { BrowserPolicy } = Package['browser-policy-common'];
 
   // Allow the remote mocha.css file to be inserted, in case any CSP stuff
   // exists for the domain.
   BrowserPolicy.content.allowInlineStyles();
-  BrowserPolicy.content.allowStyleOrigin("https://cdn.rawgit.com");
+  BrowserPolicy.content.allowStyleOrigin('https://cdn.rawgit.com');
 }
 
 // Since intermingling client and server log lines would be confusing,
@@ -29,10 +35,11 @@ if (Package["browser-policy-common"] && Package["browser-policy-content"]) {
 let serverTestsDone = false;
 let clientTestsRunning = false;
 const clientLines = [];
+
 function clientLogBuffer(line) {
   if (serverTestsDone) {
     // printing and removing the extra new-line character. The first was added by the client log, the second here.
-    console.log(line.replace(/\n$/, ""));
+    console.log(line.replace(/\n$/, ''));
   } else {
     clientLines.push(line);
   }
@@ -40,14 +47,14 @@ function clientLogBuffer(line) {
 
 function printHeader(type) {
   const lines = [
-    "\n--------------------------------",
+    '\n--------------------------------',
     Meteor.isAppTest
       ? `--- RUNNING APP ${type} TESTS ---`
       : `----- RUNNING ${type} TESTS -----`,
-    "--------------------------------\n",
+    '--------------------------------\n',
   ];
   lines.forEach((line) => {
-    if (type === "CLIENT") {
+    if (type === 'CLIENT') {
       clientLogBuffer(line);
     } else {
       console.log(line);
@@ -58,35 +65,36 @@ function printHeader(type) {
 let callCount = 0;
 let clientFailures = 0;
 let serverFailures = 0;
+
 function exitIfDone(type, failures) {
   callCount++;
-  if (type === "client") {
+  if (type === 'client') {
     clientFailures = failures;
   } else {
     serverFailures = failures;
     serverTestsDone = true;
     clientLines.forEach((line) => {
       // printing and removing the extra new-line character. The first was added by the client log, the second here.
-      console.log(line.replace(/\n$/, ""));
+      console.log(line.replace(/\n$/, ''));
     });
   }
 
   if (callCount === 2) {
     // We only need to show this final summary if we ran both kinds of tests in the same console
     if (
-      runnerOptions.runServer &&
-      runnerOptions.runClient &&
-      runnerOptions.browserDriver
+      runnerOptions.runServer
+      && runnerOptions.runClient
+      && runnerOptions.browserDriver
     ) {
-      console.log("All tests finished!\n");
-      console.log("--------------------------------");
+      console.log('All tests finished!\n');
+      console.log('--------------------------------');
       console.log(
-        `${Meteor.isAppTest ? "APP " : ""}SERVER FAILURES: ${serverFailures}`
+        `${Meteor.isAppTest ? 'APP ' : ''}SERVER FAILURES: ${serverFailures}`,
       );
       console.log(
-        `${Meteor.isAppTest ? "APP " : ""}CLIENT FAILURES: ${clientFailures}`
+        `${Meteor.isAppTest ? 'APP ' : ''}CLIENT FAILURES: ${clientFailures}`,
       );
-      console.log("--------------------------------");
+      console.log('--------------------------------');
     }
 
     handleCoverage(coverageOptions).then(() => {
@@ -104,13 +112,13 @@ function exitIfDone(type, failures) {
 
 function serverTests(cb) {
   if (!runnerOptions.runServer) {
-    console.log("SKIPPING SERVER TESTS BECAUSE TEST_SERVER=0");
-    exitIfDone("server", 0);
+    console.log('SKIPPING SERVER TESTS BECAUSE TEST_SERVER=0');
+    exitIfDone('server', 0);
     if (cb) cb();
     return;
   }
 
-  printHeader("SERVER");
+  printHeader('SERVER');
 
   if (grep) mochaInstance.grep(grep);
   if (invert) mochaInstance.invert(invert);
@@ -119,18 +127,18 @@ function serverTests(cb) {
   // We need to set the reporter when the tests actually run to ensure no conflicts with
   // other test driver packages that may be added to the app but are not actually being
   // used on this run.
-  mochaInstance.reporter(serverReporter || reporter || "spec", {
+  mochaInstance.reporter(serverReporter || reporter || 'spec', {
     output: serverOutput,
   });
 
   mochaInstance.run((failureCount) => {
-    if (typeof failureCount !== "number") {
+    if (typeof failureCount !== 'number') {
       console.log(
-        "Mocha did not return a failure count for server tests as expected"
+        'Mocha did not return a failure count for server tests as expected',
       );
-      exitIfDone("server", 1);
+      exitIfDone('server', 1);
     } else {
-      exitIfDone("server", failureCount);
+      exitIfDone('server', failureCount);
     }
     if (cb) cb();
   });
@@ -138,26 +146,26 @@ function serverTests(cb) {
 
 function clientTests() {
   if (clientTestsRunning) {
-    console.log("CLIENT TESTS ALREADY RUNNING");
+    console.log('CLIENT TESTS ALREADY RUNNING');
     return;
   }
 
   if (!runnerOptions.runClient) {
-    console.log("SKIPPING CLIENT TESTS BECAUSE TEST_CLIENT=0");
-    exitIfDone("client", 0);
+    console.log('SKIPPING CLIENT TESTS BECAUSE TEST_CLIENT=0');
+    exitIfDone('client', 0);
     return;
   }
 
   if (!runnerOptions.browserDriver) {
     console.log(
-      "Load the app in a browser to run client tests, or set the TEST_BROWSER_DRIVER environment variable. " +
-        "See https://github.com/meteortesting/meteor-mocha/blob/master/README.md#run-app-tests"
+      'Load the app in a browser to run client tests, or set the TEST_BROWSER_DRIVER environment variable. '
+        + 'See https://github.com/meteortesting/meteor-mocha/blob/master/README.md#run-app-tests',
     );
-    exitIfDone("client", 0);
+    exitIfDone('client', 0);
     return;
   }
 
-  printHeader("CLIENT");
+  printHeader('CLIENT');
   clientTestsRunning = true;
 
   startBrowser({
@@ -184,13 +192,13 @@ function clientTests() {
     },
     done(failureCount) {
       clientTestsRunning = false;
-      if (typeof failureCount !== "number") {
+      if (typeof failureCount !== 'number') {
         console.log(
-          "The browser driver package did not return a failure count for server tests as expected"
+          'The browser driver package did not return a failure count for server tests as expected',
         );
-        exitIfDone("client", 1);
+        exitIfDone('client', 1);
       } else {
-        exitIfDone("client", failureCount);
+        exitIfDone('client', failureCount);
       }
     },
   });
@@ -198,9 +206,10 @@ function clientTests() {
 
 // Before Meteor calls the `start` function, app tests will be parsed and loaded by Mocha
 function start() {
-  runnerOptions = setArgs().runnerOptions;
-  coverageOptions = setArgs().coverageOptions;
-  mochaOptions = setArgs().mochaOptions;
+  const args = setArgs();
+  runnerOptions = args.runnerOptions;
+  coverageOptions = args.coverageOptions;
+  mochaOptions = args.mochaOptions;
   grep = mochaOptions.grep;
   invert = mochaOptions.invert;
   reporter = mochaOptions.reporter;
@@ -213,7 +222,7 @@ function start() {
   // If you want parallel you will know these risks.
   if (runnerOptions.runParallel) {
     console.log(
-      "Warning: Running in parallel can cause side-effects from state/db sharing"
+      'Warning: Running in parallel can cause side-effects from state/db sharing',
     );
 
     serverTests();
@@ -227,18 +236,18 @@ function start() {
 
 export { start };
 
-onMessage("client-refresh", (options) => {
+onMessage('client-refresh', (options) => {
   console.log(
-    "CLIENT TESTS RESTARTING (client-refresh)",
-    options === undefined ? "" : options
+    'CLIENT TESTS RESTARTING (client-refresh)',
+    options === undefined ? '' : options,
   );
   clientTests();
 });
 
-onMessage("webapp-reload-client", (options) => {
+onMessage('webapp-reload-client', (options) => {
   console.log(
-    "CLIENT TESTS RESTARTING (webapp-reload-client)",
-    options === undefined ? "" : options
+    'CLIENT TESTS RESTARTING (webapp-reload-client)',
+    options === undefined ? '' : options,
   );
   clientTests();
 });

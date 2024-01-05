@@ -1,17 +1,21 @@
 {
-  "name": "dummy-app-for-mocha-testing",
+  "name": "test-proxy",
   "private": true,
   "scripts": {
-    "test": "npm run test:app:nightmare",
-    "test:watch": "npm run test:app:nightmare:watch",
-    "test:debug": "DEBUG='meteor-mocha:*' DEBUG_FD=1 DEBUG_COLORS=1 npm run test:app:nightmare:watch",
-    "test:unit:nightmare": "TEST_BROWSER_DRIVER=nightmare meteor test --once --driver-package meteortesting:mocha",
-    "test:unit:nightmare:watch": "TEST_WATCH=1 TEST_BROWSER_DRIVER=nightmare meteor test --driver-package meteortesting:mocha",
-    "test:app:nightmare": "TEST_BROWSER_DRIVER=nightmare meteor test --full-app --once --driver-package meteortesting:mocha",
-    "test:app:nightmare:watch": "TEST_WATCH=1 TEST_BROWSER_DRIVER=nightmare meteor test --full-app --driver-package meteortesting:mocha"
+    "start": "meteor run",
+    "setup": "mkdir -p packages && ln -sfn ../../../package ./packages/meteor-mocha",
+    "test": "npm run test:app:puppeteer",
+    "test:browser": "METEOR_PACKAGE_DIRS=../../:../../../ TEST_WATCH=1 meteor test --driver-package meteortesting:mocha",
+    "test:watch": "npm run test:app:puppeteer:watch",
+    "test:debug": "DEBUG='meteor-mocha:*' DEBUG_FD=1 DEBUG_COLORS=1 npm run test:app:puppeteer:watch",
+    "test:unit:puppeteer": "TEST_BROWSER_DRIVER=puppeteer meteor test --once --driver-package meteortesting:mocha",
+    "test:unit:puppeteer:watch": "TEST_WATCH=1 TEST_BROWSER_DRIVER=puppeteer meteor test --driver-package meteortesting:mocha",
+    "test:app:puppeteer": "METEOR_PACKAGE_DIRS=../../:../../../ TEST_BROWSER_DRIVER=puppeteer meteor test --full-app --once --driver-package meteortesting:mocha",
+    "test:app:puppeteer:watch": "METEOR_PACKAGE_DIRS=../../:../../../ TEST_WATCH=1 TEST_BROWSER_DRIVER=puppeteer meteor test --full-app --driver-package meteortesting:mocha"
   },
   "dependencies": {
-    "@babel/runtime": "7.0.0-beta.55",
-    "nightmare": "2.10.0"
+    "@babel/runtime": "^7.23.5",
+    "meteor-node-stubs": "^1.2.7",
+    "puppeteer": "^18.2.1"
   }
 }
