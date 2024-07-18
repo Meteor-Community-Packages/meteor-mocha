@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 3.0.3
+
+- Official publish for support Meteor 3
+ 
 ## 3.0.0
 
 - Meteor 3.0 compatibility; drop Fibers
