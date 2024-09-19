@@ -30,9 +30,8 @@ export default function setArgs() {
     mochaOptions: {
       grep: MOCHA_GREP || false,
       invert: !!MOCHA_INVERT,
-      reporter: MOCHA_REPORTER,
-      serverReporter: SERVER_TEST_REPORTER || XUNIT_FILE, // XUNIT_FILE is left in here for compatibility to older versions
-      clientReporter: CLIENT_TEST_REPORTER,
+      serverReporter: SERVER_TEST_REPORTER || MOCHA_REPORTER || XUNIT_FILE, // XUNIT_FILE is left in here for compatibility to older versions
+      clientReporter: CLIENT_TEST_REPORTER || MOCHA_REPORTER,
       serverOutput: SERVER_MOCHA_OUTPUT,
       clientOutput: CLIENT_MOCHA_OUTPUT,
     },

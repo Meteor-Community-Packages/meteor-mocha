@@ -41,7 +41,7 @@ function runTests() {
 
   if (!runnerOptions.runClient) return;
 
-  const { clientReporter, grep, invert, reporter } = mochaOptions || {};
+  const { clientReporter, grep, invert } = mochaOptions || {};
   if (grep) mocha.grep(grep);
   if (invert) mocha.invert(invert);
 
@@ -52,7 +52,7 @@ function runTests() {
     mocha.color(true);
   }
 
-  let currentReporter = clientReporter || reporter;
+  let currentReporter = clientReporter;
   if (!currentReporter) {
     currentReporter = runnerOptions.browserDriver ? 'spec' : 'html';
   }

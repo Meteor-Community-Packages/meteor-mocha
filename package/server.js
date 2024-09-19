@@ -13,7 +13,6 @@ let runnerOptions;
 let coverageOptions;
 let grep;
 let invert;
-let reporter;
 let clientReporter;
 let serverReporter;
 let serverOutput;
@@ -125,7 +124,7 @@ function serverTests(cb) {
   // We need to set the reporter when the tests actually run to ensure no conflicts with
   // other test driver packages that may be added to the app but are not actually being
   // used on this run.
-  mochaInstance.reporter(serverReporter || reporter || 'spec', {
+  mochaInstance.reporter(serverReporter || 'spec', {
     output: serverOutput,
   });
 
@@ -212,7 +211,6 @@ function start() {
   mochaOptions = args.mochaOptions;
   grep = mochaOptions.grep;
   invert = mochaOptions.invert;
-  reporter = mochaOptions.reporter;
   clientReporter = mochaOptions.clientReporter;
   serverReporter = mochaOptions.serverReporter;
   serverOutput = mochaOptions.serverOutput;
