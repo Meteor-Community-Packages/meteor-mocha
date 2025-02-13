@@ -14,14 +14,22 @@ function saveCoverage(config, done) {
     return;
   }
 
-  if (typeof Package === 'undefined' || !Package.meteor || !Package.meteor.Meteor || !Package.meteor.Meteor.sendCoverage) {
+  if (
+    typeof Package === 'undefined' ||
+    !Package.meteor ||
+    !Package.meteor.Meteor ||
+    !Package.meteor.Meteor.sendCoverage
+  ) {
     console.error('Coverage package missing or not correctly launched');
     done();
     return;
   }
 
   Package.meteor.Meteor.sendCoverage((stats, err) => {
-    console.log('Meteor-coverage is saving client side coverage to the server. Client js files saved ', JSON.stringify(stats));
+    console.log(
+      'Meteor-coverage is saving client side coverage to the server. Client js files saved ',
+      JSON.stringify(stats),
+    );
     if (err) {
       console.error('Failed to send client coverage');
     }
@@ -37,7 +45,8 @@ function runTests() {
   // correct reporter is used in the case where another Mocha test driver package is also
   // added to the app. Since both are testOnly packages, top-level client code in both
   // will run, potentially changing the reporter.
-  const { mochaOptions, runnerOptions, coverageOptions } = Meteor.settings.public.mochaRuntimeArgs || {};
+  const { mochaOptions, runnerOptions, coverageOptions } =
+    Meteor.settings.public.mochaRuntimeArgs || {};
 
   if (!runnerOptions.runClient) return;
 
