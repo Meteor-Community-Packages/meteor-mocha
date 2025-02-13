@@ -13,7 +13,7 @@ let runnerOptions;
 let coverageOptions;
 let grep;
 let invert;
-let reporter;
+let clientReporter;
 let serverReporter;
 let serverOutput;
 let clientOutput;
@@ -39,7 +39,7 @@ const clientLines = [];
 function clientLogBuffer(line) {
   if (serverTestsDone) {
     // printing and removing the extra new-line character. The first was added by the client log, the second here.
-    console.log(line.replace(/\n$/, ''));
+    console.log(line);
   } else {
     clientLines.push(line);
   }
@@ -73,10 +73,7 @@ function exitIfDone(type, failures) {
   } else {
     serverFailures = failures;
     serverTestsDone = true;
-    clientLines.forEach((line) => {
-      // printing and removing the extra new-line character. The first was added by the client log, the second here.
-      console.log(line.replace(/\n$/, ''));
-    });
+    clientLines.forEach(console.log);
   }
 
   if (callCount === 2) {
@@ -127,7 +124,7 @@ function serverTests(cb) {
   // We need to set the reporter when the tests actually run to ensure no conflicts with
   // other test driver packages that may be added to the app but are not actually being
   // used on this run.
-  mochaInstance.reporter(serverReporter || reporter || 'spec', {
+  mochaInstance.reporter(serverReporter || 'spec', {
     output: serverOutput,
   });
 
@@ -142,6 +139,26 @@ function serverTests(cb) {
     }
     if (cb) cb();
   });
+}
+
+function isXunitLine(line) {
+  return line.trimLeft().startsWith('<');
+}
+
+function browserOutput(data) {
+  // Take full control over line breaks to prevent duplication
+  const line = data.toString().replace(/\n$/, '');
+  if (clientOutput) {
+    // Edge case: with XUNIT reporter write only XML to the output file
+    if (clientReporter !== 'xunit' || isXunitLine(line)) {
+      fs.appendFileSync(clientOutput, `${line}\n`);
+    } else {
+      // Output non-XML lines to console (XUNIT reporter only) 
+      clientLogBuffer(line);
+    }
+  } else {
+    clientLogBuffer(line);
+  }
 }
 
 function clientTests() {
@@ -169,27 +186,9 @@ function clientTests() {
   clientTestsRunning = true;
 
   startBrowser({
-    stdout(data) {
-      if (clientOutput) {
-        fs.appendFileSync(clientOutput, data.toString());
-      } else {
-        clientLogBuffer(data.toString());
-      }
-    },
-    writebuffer(data) {
-      if (clientOutput) {
-        fs.appendFileSync(clientOutput, data.toString());
-      } else {
-        clientLogBuffer(data.toString());
-      }
-    },
-    stderr(data) {
-      if (clientOutput) {
-        fs.appendFileSync(clientOutput, data.toString());
-      } else {
-        clientLogBuffer(data.toString());
-      }
-    },
+    stdout: browserOutput,
+    writebuffer: browserOutput,
+    stderr: browserOutput,
     done(failureCount) {
       clientTestsRunning = false;
       if (typeof failureCount !== 'number') {
@@ -212,7 +211,7 @@ function start() {
   mochaOptions = args.mochaOptions;
   grep = mochaOptions.grep;
   invert = mochaOptions.invert;
-  reporter = mochaOptions.reporter;
+  clientReporter = mochaOptions.clientReporter;
   serverReporter = mochaOptions.serverReporter;
   serverOutput = mochaOptions.serverOutput;
   clientOutput = mochaOptions.clientOutput;
