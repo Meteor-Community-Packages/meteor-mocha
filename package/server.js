@@ -153,7 +153,7 @@ function browserOutput(data) {
     if (clientReporter !== 'xunit' || isXunitLine(line)) {
       fs.appendFileSync(clientOutput, `${line}\n`);
     } else {
-      // Output non-XML lines to console (XUNIT reporter only) 
+      // Output non-XML lines to console (XUNIT reporter only)
       clientLogBuffer(line);
     }
   } else {
