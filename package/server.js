@@ -3,7 +3,7 @@ import { mochaInstance } from 'meteor/meteortesting:mocha-core';
 import { startBrowser } from 'meteor/meteortesting:browser-tests';
 import { onMessage } from 'meteor/inter-process-messaging';
 
-import fs from 'fs';
+import fs from 'node:fs';
 
 import setArgs from './runtimeArgs';
 import handleCoverage from './server.handleCoverage';
@@ -53,13 +53,13 @@ function printHeader(type) {
       : `----- RUNNING ${type} TESTS -----`,
     '--------------------------------\n',
   ];
-  lines.forEach((line) => {
+  for (const line of lines) {
     if (type === 'CLIENT') {
       clientLogBuffer(line);
     } else {
       console.log(line);
     }
-  });
+  }
 }
 
 let callCount = 0;
@@ -79,9 +79,9 @@ function exitIfDone(type, failures) {
   if (callCount === 2) {
     // We only need to show this final summary if we ran both kinds of tests in the same console
     if (
-      runnerOptions.runServer
-      && runnerOptions.runClient
-      && runnerOptions.browserDriver
+      runnerOptions.runServer &&
+      runnerOptions.runClient &&
+      runnerOptions.browserDriver
     ) {
       console.log('All tests finished!\n');
       console.log('--------------------------------');
@@ -175,8 +175,8 @@ function clientTests() {
 
   if (!runnerOptions.browserDriver) {
     console.log(
-      'Load the app in a browser to run client tests, or set the TEST_BROWSER_DRIVER environment variable. '
-        + 'See https://github.com/meteortesting/meteor-mocha/blob/master/README.md#run-app-tests',
+      'Load the app in a browser to run client tests, or set the TEST_BROWSER_DRIVER environment variable. ' +
+        'See https://github.com/meteortesting/meteor-mocha/blob/master/README.md#run-app-tests',
     );
     exitIfDone('client', 0);
     return;
