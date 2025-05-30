@@ -7,9 +7,9 @@
     "test": "npm run test:app:puppeteer",
     "test:browser": "METEOR_PACKAGE_DIRS=../../:../../../ TEST_WATCH=1 meteor test --driver-package meteortesting:mocha",
     "test:watch": "npm run test:app:puppeteer:watch",
-    "test:debug": "DEBUG='meteor-mocha:*' DEBUG_FD=1 DEBUG_COLORS=1 npm run test:app:puppeteer:watch",
-    "test:unit:puppeteer": "TEST_BROWSER_DRIVER=puppeteer meteor test --once --driver-package meteortesting:mocha",
-    "test:unit:puppeteer:watch": "TEST_WATCH=1 TEST_BROWSER_DRIVER=puppeteer meteor test --driver-package meteortesting:mocha",
+    "test:debug": "METEOR_PACKAGE_DIRS=../../:../../../ DEBUG='meteor-mocha:*' DEBUG_FD=1 DEBUG_COLORS=1 npm run test:app:puppeteer:watch",
+    "test:unit:puppeteer": "METEOR_PACKAGE_DIRS=../../:../../../ TEST_BROWSER_DRIVER=puppeteer meteor test --once --driver-package meteortesting:mocha",
+    "test:unit:puppeteer:watch": "METEOR_PACKAGE_DIRS=../../:../../../ TEST_WATCH=1 TEST_BROWSER_DRIVER=puppeteer meteor test --driver-package meteortesting:mocha",
     "test:app:puppeteer": "METEOR_PACKAGE_DIRS=../../:../../../ TEST_BROWSER_DRIVER=puppeteer meteor test --full-app --once --driver-package meteortesting:mocha",
     "test:app:puppeteer:watch": "METEOR_PACKAGE_DIRS=../../:../../../ TEST_WATCH=1 TEST_BROWSER_DRIVER=puppeteer meteor test --full-app --driver-package meteortesting:mocha"
   },
