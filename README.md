@@ -1,6 +1,9 @@
 # Meteor Mocha - meteortesting:mocha
 
-
+[![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
+[![Test suite](https://github.com/Meteor-Community-Packages/meteor-mocha/actions/workflows/tests.yml/badge.svg)](https://github.com/Meteor-Community-Packages/meteor-mocha/actions/workflows/tests.yml)
+[![Formatted with Biome](https://img.shields.io/badge/Formatted_with-Biome-60a5fa?style=flat&logo=biome)](https://biomejs.dev/)
+![GitHub License](https://img.shields.io/github/license/Meteor-Community-Packages/meteor-mocha)
 
 > _Formerly published as dispatch:mocha. Originally created by [Dispatch](http://www.dispatch.me/) but now community maintained._
 

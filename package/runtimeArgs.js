@@ -30,15 +30,14 @@ export default function setArgs() {
     mochaOptions: {
       grep: MOCHA_GREP || false,
       invert: !!MOCHA_INVERT,
-      reporter: MOCHA_REPORTER,
-      serverReporter: SERVER_TEST_REPORTER || XUNIT_FILE, // XUNIT_FILE is left in here for compatibility to older versions
-      clientReporter: CLIENT_TEST_REPORTER,
+      serverReporter: SERVER_TEST_REPORTER || MOCHA_REPORTER || XUNIT_FILE, // XUNIT_FILE is left in here for compatibility to older versions
+      clientReporter: CLIENT_TEST_REPORTER || MOCHA_REPORTER,
       serverOutput: SERVER_MOCHA_OUTPUT,
       clientOutput: CLIENT_MOCHA_OUTPUT,
     },
     runnerOptions: {
-      runClient: (TEST_CLIENT !== 'false' && TEST_CLIENT !== '0'),
-      runServer: (TEST_SERVER !== 'false' && TEST_SERVER !== '0'),
+      runClient: TEST_CLIENT !== 'false' && TEST_CLIENT !== '0',
+      runServer: TEST_SERVER !== 'false' && TEST_SERVER !== '0',
       browserDriver: TEST_BROWSER_DRIVER,
       testWatch: TEST_WATCH || METEOR_AUTO_RESTART === 'true',
       runParallel: !!TEST_PARALLEL,
@@ -49,15 +48,22 @@ export default function setArgs() {
     runtimeArgs.coverageOptions = {
       verbose: COVERAGE_VERBOSE === '1',
       in: {
-        coverage: COVERAGE_IN_COVERAGE === 'true' || COVERAGE_IN_COVERAGE === '1',
+        coverage:
+          COVERAGE_IN_COVERAGE === 'true' || COVERAGE_IN_COVERAGE === '1',
       },
       out: {
-        coverage: COVERAGE_OUT_COVERAGE === 'true' || COVERAGE_OUT_COVERAGE === '1',
-        lcovonly: COVERAGE_OUT_LCOVONLY === 'true' || COVERAGE_OUT_LCOVONLY === '1',
+        coverage:
+          COVERAGE_OUT_COVERAGE === 'true' || COVERAGE_OUT_COVERAGE === '1',
+        lcovonly:
+          COVERAGE_OUT_LCOVONLY === 'true' || COVERAGE_OUT_LCOVONLY === '1',
         html: COVERAGE_OUT_HTML === 'true' || COVERAGE_OUT_HTML === '1',
         json: COVERAGE_OUT_JSON === 'true' || COVERAGE_OUT_JSON === '1',
-        json_summary: COVERAGE_OUT_JSON_SUMMARY === 'true' || COVERAGE_OUT_JSON_SUMMARY === '1',
-        text_summary: COVERAGE_OUT_TEXT_SUMMARY === 'true' || COVERAGE_OUT_TEXT_SUMMARY === '1',
+        json_summary:
+          COVERAGE_OUT_JSON_SUMMARY === 'true' ||
+          COVERAGE_OUT_JSON_SUMMARY === '1',
+        text_summary:
+          COVERAGE_OUT_TEXT_SUMMARY === 'true' ||
+          COVERAGE_OUT_TEXT_SUMMARY === '1',
         remap: COVERAGE_OUT_REMAP === 'true' || COVERAGE_OUT_REMAP === '1',
       },
     };

@@ -27,7 +27,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-20-
 
-      - run: npm ci && npm run lint
+      - run: npm ci && npm run lint && npm run format
 
   test:
     name: Meteor package tests
@@ -36,7 +36,7 @@ jobs:
     strategy:
       matrix:
         meteorRelease:
-          - '3.0'
+          - '3.2.2'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -64,5 +64,5 @@ jobs:
           cd tests/dummy_app
           npm ci
 
-      - name: Run tests
-        run: ./test.sh
+      - name: Run puppeteer tests
+        run: ./test.sh puppeteer

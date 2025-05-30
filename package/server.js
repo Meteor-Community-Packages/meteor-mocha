@@ -3,7 +3,7 @@ import { mochaInstance } from 'meteor/meteortesting:mocha-core';
 import { startBrowser } from 'meteor/meteortesting:browser-tests';
 import { onMessage } from 'meteor/inter-process-messaging';
 
-import fs from 'fs';
+import fs from 'node:fs';
 
 import setArgs from './runtimeArgs';
 import handleCoverage from './server.handleCoverage';
@@ -13,7 +13,7 @@ let runnerOptions;
 let coverageOptions;
 let grep;
 let invert;
-let reporter;
+let clientReporter;
 let serverReporter;
 let serverOutput;
 let clientOutput;
@@ -39,7 +39,7 @@ const clientLines = [];
 function clientLogBuffer(line) {
   if (serverTestsDone) {
     // printing and removing the extra new-line character. The first was added by the client log, the second here.
-    console.log(line.replace(/\n$/, ''));
+    console.log(line);
   } else {
     clientLines.push(line);
   }
@@ -53,13 +53,13 @@ function printHeader(type) {
       : `----- RUNNING ${type} TESTS -----`,
     '--------------------------------\n',
   ];
-  lines.forEach((line) => {
+  for (const line of lines) {
     if (type === 'CLIENT') {
       clientLogBuffer(line);
     } else {
       console.log(line);
     }
-  });
+  }
 }
 
 let callCount = 0;
@@ -73,18 +73,15 @@ function exitIfDone(type, failures) {
   } else {
     serverFailures = failures;
     serverTestsDone = true;
-    clientLines.forEach((line) => {
-      // printing and removing the extra new-line character. The first was added by the client log, the second here.
-      console.log(line.replace(/\n$/, ''));
-    });
+    clientLines.forEach(console.log);
   }
 
   if (callCount === 2) {
     // We only need to show this final summary if we ran both kinds of tests in the same console
     if (
-      runnerOptions.runServer
-      && runnerOptions.runClient
-      && runnerOptions.browserDriver
+      runnerOptions.runServer &&
+      runnerOptions.runClient &&
+      runnerOptions.browserDriver
     ) {
       console.log('All tests finished!\n');
       console.log('--------------------------------');
@@ -127,7 +124,7 @@ function serverTests(cb) {
   // We need to set the reporter when the tests actually run to ensure no conflicts with
   // other test driver packages that may be added to the app but are not actually being
   // used on this run.
-  mochaInstance.reporter(serverReporter || reporter || 'spec', {
+  mochaInstance.reporter(serverReporter || 'spec', {
     output: serverOutput,
   });
 
@@ -144,6 +141,26 @@ function serverTests(cb) {
   });
 }
 
+function isXunitLine(line) {
+  return line.trimLeft().startsWith('<');
+}
+
+function browserOutput(data) {
+  // Take full control over line breaks to prevent duplication
+  const line = data.toString().replace(/\n$/, '');
+  if (clientOutput) {
+    // Edge case: with XUNIT reporter write only XML to the output file
+    if (clientReporter !== 'xunit' || isXunitLine(line)) {
+      fs.appendFileSync(clientOutput, `${line}\n`);
+    } else {
+      // Output non-XML lines to console (XUNIT reporter only)
+      clientLogBuffer(line);
+    }
+  } else {
+    clientLogBuffer(line);
+  }
+}
+
 function clientTests() {
   if (clientTestsRunning) {
     console.log('CLIENT TESTS ALREADY RUNNING');
@@ -158,8 +175,8 @@ function clientTests() {
 
   if (!runnerOptions.browserDriver) {
     console.log(
-      'Load the app in a browser to run client tests, or set the TEST_BROWSER_DRIVER environment variable. '
-        + 'See https://github.com/meteortesting/meteor-mocha/blob/master/README.md#run-app-tests',
+      'Load the app in a browser to run client tests, or set the TEST_BROWSER_DRIVER environment variable. ' +
+        'See https://github.com/meteortesting/meteor-mocha/blob/master/README.md#run-app-tests',
     );
     exitIfDone('client', 0);
     return;
@@ -169,27 +186,9 @@ function clientTests() {
   clientTestsRunning = true;
 
   startBrowser({
-    stdout(data) {
-      if (clientOutput) {
-        fs.appendFileSync(clientOutput, data.toString());
-      } else {
-        clientLogBuffer(data.toString());
-      }
-    },
-    writebuffer(data) {
-      if (clientOutput) {
-        fs.appendFileSync(clientOutput, data.toString());
-      } else {
-        clientLogBuffer(data.toString());
-      }
-    },
-    stderr(data) {
-      if (clientOutput) {
-        fs.appendFileSync(clientOutput, data.toString());
-      } else {
-        clientLogBuffer(data.toString());
-      }
-    },
+    stdout: browserOutput,
+    writebuffer: browserOutput,
+    stderr: browserOutput,
     done(failureCount) {
       clientTestsRunning = false;
       if (typeof failureCount !== 'number') {
@@ -212,7 +211,7 @@ function start() {
   mochaOptions = args.mochaOptions;
   grep = mochaOptions.grep;
   invert = mochaOptions.invert;
-  reporter = mochaOptions.reporter;
+  clientReporter = mochaOptions.clientReporter;
   serverReporter = mochaOptions.serverReporter;
   serverOutput = mochaOptions.serverOutput;
   clientOutput = mochaOptions.clientOutput;
