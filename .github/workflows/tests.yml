@@ -17,15 +17,15 @@ jobs:
       - name: setup node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
       - name: cache dependencies
         uses: actions/cache@v4
         with:
           path: ~/.npm
-          key: ${{ runner.os }}-node-20-${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-node-22-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
-            ${{ runner.os }}-node-20-
+            ${{ runner.os }}-node-22-
 
       - run: npm ci && npm run lint && npm run format
 
@@ -37,6 +37,7 @@ jobs:
       matrix:
         meteorRelease:
           - '3.2.2'
+          - '3.4'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -44,7 +45,7 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
       - name: Setup meteor ${{ matrix.meteorRelease }}
         uses: meteorengineer/setup-meteor@v1
@@ -55,9 +56,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.npm
-          key: ${{ runner.os }}-node-20-${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-node-22-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
-            ${{ runner.os }}-node-20-
+            ${{ runner.os }}-node-22-
 
       - name: Install test dependencies
         run: |
