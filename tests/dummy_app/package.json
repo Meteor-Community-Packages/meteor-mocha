@@ -21,12 +21,12 @@
     "test:app:playwright": "METEOR_PACKAGE_DIRS=../../:../../../ TEST_BROWSER_DRIVER=playwright meteor test --full-app --once --driver-package meteortesting:mocha"
   },
   "dependencies": {
-    "@babel/runtime": "^7.24.8",
-    "chromedriver": "^136.0.3",
-    "meteor-node-stubs": "^1.2.19",
+    "@babel/runtime": "^7.29.2",
+    "chromedriver": "^147.0.0",
+    "meteor-node-stubs": "^1.2.27",
     "nightmare": "^3.0.2",
-    "playwright": "^1.55.1",
-    "puppeteer": "^22.14.0",
-    "selenium-webdriver": "^4.33.0"
+    "playwright": "^1.58.2",
+    "puppeteer": "^24.40.0",
+    "selenium-webdriver": "^4.41.0"
   }
 }
