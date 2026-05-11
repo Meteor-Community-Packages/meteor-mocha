@@ -210,7 +210,7 @@ async function start() {
   // startup queue to still be draining when the test driver's start() is called.
   // Adding a callback at the end of the queue ensures it runs after all prior
   // callbacks have finished. See: https://github.com/Meteor-Community-Packages/meteor-mocha/issues/176
-  await new Promise(resolve => Meteor.startup(resolve));
+  await new Promise((resolve) => Meteor.startup(resolve));
 
   const args = setArgs();
   runnerOptions = args.runnerOptions;
