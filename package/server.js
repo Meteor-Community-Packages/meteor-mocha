@@ -203,15 +203,14 @@ function clientTests() {
   });
 }
 
-// Before Meteor calls the `start` function, app tests will be parsed and loaded by Mocha
-async function start() {
-  // Wait for all Meteor.startup() callbacks (including async ones) to complete.
-  // In Meteor 3.x, async startup callbacks and top-level await can cause the
-  // startup queue to still be draining when the test driver's start() is called.
-  // Adding a callback at the end of the queue ensures it runs after all prior
-  // callbacks have finished. See: https://github.com/Meteor-Community-Packages/meteor-mocha/issues/176
-  await new Promise((resolve) => Meteor.startup(resolve));
+// Run tests from a new startup hook so every hook already queued, including
+// async ones, completes first. Awaiting a callback added to the startup queue
+// here would deadlock: this function itself is run by that queue.
+function start() {
+  Meteor.startup(runTests);
+}
 
+function runTests() {
   const args = setArgs();
   runnerOptions = args.runnerOptions;
   coverageOptions = args.coverageOptions;
