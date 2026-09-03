@@ -6,7 +6,12 @@ import { onMessage } from 'meteor/inter-process-messaging';
 import fs from 'node:fs';
 
 import setArgs from './runtimeArgs';
+import attributeTestFiles from './server.fileAttribution';
 import handleCoverage from './server.handleCoverage';
+
+// Must run before the app's test files are loaded, so that the suites they
+// declare are attributed to the file they were declared in.
+attributeTestFiles();
 
 let mochaOptions;
 let runnerOptions;

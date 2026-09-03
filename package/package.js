@@ -9,7 +9,7 @@ Package.describe({
 
 Package.onUse(function onUse(api) {
   api.versionsFrom(['2.8.0', '3.0']);
-  api.use(['meteortesting:mocha-core@8.2.0', 'ecmascript']);
+  api.use(['meteortesting:mocha-core@8.2.0 || 9.0.0', 'ecmascript']);
 
   api.use(['meteortesting:browser-tests@1.8.0', 'fetch'], 'server');
   api.use('browser-policy', 'server', { weak: true });

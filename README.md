@@ -129,6 +129,26 @@ To write the tests to a file, set `SERVER_MOCHA_OUTPUT` and `CLIENT_MOCHA_OUTPUT
 $ MOCHA_REPORTER=xunit SERVER_MOCHA_OUTPUT=$PWD/unit_server.xml CLIENT_MOCHA_OUTPUT=$PWD/unit_client.xml meteor test --once --driver-package meteortesting:mocha
 ```
 
+### Test file names in reporter output
+
+Server-side suites and tests carry the app-relative path of the file they were
+declared in, e.g. `server/user.tests.js`, so reporters that report it do too:
+
+```xml
+<testcase classname="user methods" name="creates a user" file="server/user.tests.js" time="0.012"/>
+```
+
+This makes the `xunit` output usable with CI test splitting that matches timing
+data by file name. It requires `meteortesting:mocha-core@9.0.0` or later, whose
+mocha version writes the `file` attribute.
+
+Suites created by a helper are attributed to the file that called the helper,
+not to the file the helper lives in. In `meteor test-packages` runs the path is
+the one inside the package, e.g. `packages/my-package/user.tests.js`.
+
+Client-side suites are not attributed, because browser stack traces are not
+mapped back to the app's source files.
+
 ### Run with a different server reporter
 
 The default Mocha reporter for server tests is the "spec" reporter. You can set the `SERVER_TEST_REPORTER` environment variable to change it.
