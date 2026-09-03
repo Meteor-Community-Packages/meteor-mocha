@@ -203,8 +203,14 @@ function clientTests() {
   });
 }
 
-// Before Meteor calls the `start` function, app tests will be parsed and loaded by Mocha
+// Run tests from a new startup hook so every hook already queued, including
+// async ones, completes first. Awaiting a callback added to the startup queue
+// here would deadlock: this function itself is run by that queue.
 function start() {
+  Meteor.startup(runTests);
+}
+
+function runTests() {
   const args = setArgs();
   runnerOptions = args.runnerOptions;
   coverageOptions = args.coverageOptions;

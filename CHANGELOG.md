@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 3.4.0
+
+- Await pending `Meteor.startup()` callbacks before running tests, so async startup work (e.g. ensuring MongoDB indices) finishes before `mocha.run()` fires on Meteor 3.x. [PR #177](https://github.com/Meteor-Community-Packages/meteor-mocha/pull/177)
+
 ## 3.0.0
 
 - Meteor 3.0 compatibility; drop Fibers
