@@ -10,7 +10,7 @@ fetch@0.2.0
 inter-process-messaging@0.1.2
 meteor@2.3.1
 meteortesting:browser-tests@1.8.0
-meteortesting:mocha@3.4.0-rc.1
+meteortesting:mocha@3.4.0
 meteortesting:mocha-core@8.3.1-rc300.1
 modern-browsers@0.2.3
 modules@0.20.3
