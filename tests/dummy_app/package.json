@@ -26,7 +26,7 @@
     "meteor-node-stubs": "^1.2.27",
     "nightmare": "^3.0.2",
     "playwright": "^1.58.2",
-    "puppeteer": "^24.40.0",
+    "puppeteer": "^25.16.0",
     "selenium-webdriver": "^4.41.0"
   }
 }
